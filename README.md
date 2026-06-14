@@ -7,7 +7,7 @@
 
 `sksovereign-agent` is the **developer-facing front door** of the
 [SKWorld](https://skworld.io) sovereign ecosystem. The full stack — `capauth`,
-`skmemory`, `skchat`, `skcomm`, `skcapstone` — is powerful but spread across
+`skmemory`, `skchat`, `skcomms`, `skcapstone` — is powerful but spread across
 several packages. This SDK gives you **one class, `Agent`**, that wraps all of
 them and lazily turns each one on only when you use it.
 
@@ -38,7 +38,7 @@ history live under one home directory you control (default `~/.skcapstone`).
 ```bash
 pip install sksovereign-agent          # the SDK + its own light deps (pydantic, PGPy, click, rich)
 # then add the capabilities you want:
-pip install capauth skmemory skchat skcomm skcapstone
+pip install capauth skmemory skchat skcomms skcapstone
 ```
 
 ```python
@@ -81,8 +81,8 @@ installed.
 | `.init(email, passphrase, entity_type)` | Create **or** load a PGP identity + open the memory store | `capauth`, `skmemory` |
 | `.remember(content, title, tags, intensity)` | Store a memory (with optional emotional intensity 0–10) | `skmemory` |
 | `.recall(query, limit)` | Search memories by text | `skmemory` |
-| `.send(recipient, content, thread_id)` | Store + deliver an encrypted chat message | `skchat`, `skcomm` |
-| `.receive()` | Poll the inbox for incoming messages | `skchat`, `skcomm` |
+| `.send(recipient, content, thread_id)` | Store + deliver an encrypted chat message | `skchat`, `skcomms` |
+| `.receive()` | Poll the inbox for incoming messages | `skchat`, `skcomms` |
 | `.encrypt / .decrypt / .sign / .verify` | PGP message crypto against a peer's fingerprint | `capauth` |
 | `.install_soul / .load_soul / .unload_soul / .list_souls / .active_soul` | Swap a **personality overlay** without changing identity | `skcapstone` |
 | `.status()` | One dict: name, home, identity, memory, active soul, version | all of the above |
@@ -118,7 +118,7 @@ flowchart TD
       end
       subgraph COMMS["comms"]
         SKCHAT["skchat<br/>chat messages + history"]
-        SKCOMM["skcomm<br/>transport-agnostic delivery"]
+        SKCOMMS["skcomms<br/>transport-agnostic delivery"]
       end
     end
     CORE -.->|"deployed/resolved by"| SKOS["skos (sovereign agent OS)"]

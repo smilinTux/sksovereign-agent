@@ -197,7 +197,7 @@ class Agent:
     ) -> dict:
         """Send a chat message to another agent.
 
-        Uses SKChat + SKComm if available, falls back to
+        Uses SKChat + SKComms if available, falls back to
         local storage only.
 
         Args:
@@ -228,10 +228,10 @@ class Agent:
 
             try:
                 from skchat.transport import ChatTransport
-                from skcomm import SKComm
+                from skcomms import SKComms
 
-                comm = SKComm.from_config()
-                transport = ChatTransport(skcomm=comm, history=history, identity=f"capauth:{sender}")
+                comm = SKComms.from_config()
+                transport = ChatTransport(skcomms=comm, history=history, identity=f"capauth:{sender}")
                 delivery = transport.send_message(msg)
                 result["delivered"] = delivery.get("delivered", False)
             except Exception:
@@ -250,15 +250,15 @@ class Agent:
         """
         try:
             from skchat.transport import ChatTransport
-            from skcomm import SKComm
+            from skcomms import SKComms
 
             history = self._get_history()
             if not history:
                 return []
 
-            comm = SKComm.from_config()
+            comm = SKComms.from_config()
             sender = self._identity.get("fingerprint", self.name) if self._identity else self.name
-            transport = ChatTransport(skcomm=comm, history=history, identity=f"capauth:{sender}")
+            transport = ChatTransport(skcomms=comm, history=history, identity=f"capauth:{sender}")
             messages = transport.poll_inbox()
 
             return [

@@ -2,7 +2,7 @@
 
 `sksovereign-agent` is a **facade SDK**. It contains almost no infrastructure of
 its own: its job is to present the five-package sovereign stack (`capauth`,
-`skmemory`, `skchat`, `skcomm`, `skcapstone`) as a single, friendly `Agent`
+`skmemory`, `skchat`, `skcomms`, `skcapstone`) as a single, friendly `Agent`
 object — and to make every one of those packages **optional at runtime**.
 
 This document explains the two design contracts that make that work — **lazy
@@ -30,7 +30,7 @@ flowchart TD
     INIT -->|"open store"| SKMEM["skmemory<br/>(MemoryStore + SQLiteBackend)"]
     MEM --> SKMEM
     MSG -->|"ChatMessage + ChatHistory"| SKCHAT["skchat<br/>(models, history, transport)"]
-    MSG -->|"transport-agnostic delivery"| SKCOMM["skcomm<br/>(SKComm.from_config)"]
+    MSG -->|"transport-agnostic delivery"| SKCOMMS["skcomms<br/>(SKComms.from_config)"]
     CRYPT -->|"PGP backend"| CAPAUTH
     SOUL -->|"SoulManager"| SKCAP["skcapstone<br/>(soul overlays)"]
     STAT --> SKMEM
@@ -119,17 +119,17 @@ sequenceDiagram
     participant SC as skchat
     participant H as ChatHistory
     participant T as ChatTransport
-    participant CM as skcomm
+    participant CM as skcomms
 
     U->>A: .send("capauth:peer@mesh", "hi")
     A->>SC: ChatMessage(sender=capauth:<fpr>, recipient, content)
     A->>H: _get_history().store_message(msg)
     H-->>A: stored = True
-    A->>CM: SKComm.from_config()
-    A->>T: ChatTransport(skcomm, history, identity).send_message(msg)
+    A->>CM: SKComms.from_config()
+    A->>T: ChatTransport(skcomms, history, identity).send_message(msg)
     T-->>A: {delivered: bool}
     A-->>U: {recipient, stored, delivered}
-    Note over A,T: if skcomm/transport unavailable,<br/>delivered = False but stored stays True
+    Note over A,T: if skcomms/transport unavailable,<br/>delivered = False but stored stays True
 ```
 
 `receive()` mirrors this: it builds the same `ChatTransport` and calls
@@ -165,7 +165,7 @@ back to `capauth:<name>` otherwise, so messages are always attributable.
 | **skmemory** | core | `MemoryStore`, `SQLiteBackend`, `models.EmotionalSnapshot`; `snapshot()`, `search()`, `list_memories()` |
 | **skcapstone** | core | `soul.SoulManager` — install / load / unload / list personality overlays |
 | **skchat** | comms | `models.ChatMessage`, `history.ChatHistory`, `transport.ChatTransport` |
-| **skcomm** | comms | `SKComm.from_config()` — transport-agnostic message delivery |
+| **skcomms** | comms | `SKComms.from_config()` — transport-agnostic message delivery |
 
 ---
 
@@ -182,7 +182,7 @@ flowchart TD
     end
     subgraph COMMS["Comms (delivery)"]
       SKCHAT["skchat (messages)"]
-      SKCOMM["skcomm (transport)"]
+      SKCOMMS["skcomms (transport)"]
     end
     subgraph OS["Deployment substrate"]
       SKOS["skos (sovereign agent OS)<br/>resolves capabilities → adapters per profile"]
@@ -192,7 +192,7 @@ flowchart TD
     SDK --> SKMEMORY
     SDK --> SKCAP
     SDK --> SKCHAT
-    SDK --> SKCOMM
+    SDK --> SKCOMMS
     CORE -.->|"deployed via"| SKOS
     COMMS -.->|"deployed via"| SKOS
 ```
